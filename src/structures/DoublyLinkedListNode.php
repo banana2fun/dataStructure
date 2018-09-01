@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace DataStructure\structures;
 
 use DataStructure\contracts\DoublyLinkedListInterface;
+use DataStructure\contracts\DoublyLinkedListNodeIterator;
 use DataStructure\nodes\ListNode;
 
 class DoublyLinkedListNode implements DoublyLinkedListInterface, \ArrayAccess, \IteratorAggregate
@@ -13,7 +14,7 @@ class DoublyLinkedListNode implements DoublyLinkedListInterface, \ArrayAccess, \
     protected $first;
     /** @var ListNode */
     protected $last;
-    protected $count = 0;
+    public $count = 0;
     protected $position = 0;
 
     public function pushFirst($value): void
@@ -51,6 +52,11 @@ class DoublyLinkedListNode implements DoublyLinkedListInterface, \ArrayAccess, \
         if ($this->isEmpty()) {
             throw new \Exception('Список пуст');
         }
+        if ($this->count === 1) {
+            $this->first = $this->last = null;
+            $this->count--;
+            return null;
+        }
         $c = $this->first;
         $this->first = $this->first->getNext();
         $this->first->setPrevious();
@@ -62,6 +68,11 @@ class DoublyLinkedListNode implements DoublyLinkedListInterface, \ArrayAccess, \
     {
         if ($this->isEmpty()) {
             throw new \Exception('Список пуст');
+        }
+        if ($this->count === 1) {
+            $c = $this->first = $this->last = null;
+            $this->count--;
+            return null;
         }
         $c = $this->last;
         $this->last = $this->last->getPrevious();
@@ -78,30 +89,19 @@ class DoublyLinkedListNode implements DoublyLinkedListInterface, \ArrayAccess, \
         return false;
     }
 
-    public function at($index, bool $back = null)
+    public function at(int $index, bool $back)
     {
-        if (!$back) {
-            $current = $this->first;
-            $item = 1;
-            while ($current) {
-                if ($item === $index) {
-                    return $current->getValue();
-                }
-                $item++;
-                $current = $current->getNext();
+        $back === false ? $current = $this->first : $current = $this->last;
+        $item = 1;
+        while ($current) {
+            if ($item === $index) {
+                return $current->getValue();
             }
-        } else {
-            $current = $this->last;
-            $item = 1;
-            while ($current) {
-                if ($item === $index) {
-                    return $current->getValue();
-                }
-                $item++;
-                $current = $current->getPrevious();
-            }
+            $item++;
+            $back === false ? $current = $current->getNext() : $current = $current->getPrevious();
         }
     }
+
 
     public function offsetExists($offset)
     {
@@ -117,7 +117,7 @@ class DoublyLinkedListNode implements DoublyLinkedListInterface, \ArrayAccess, \
             throw new \Exception('Неверный номер элемента');
         }
         $current = $this->first;
-        for ($i = 0; $i < $offset; $i++) {
+       while (--$offset) {
             $current = $current->getNext();
         }
         return $current->getValue();
@@ -129,7 +129,7 @@ class DoublyLinkedListNode implements DoublyLinkedListInterface, \ArrayAccess, \
             throw new \Exception('Неверный номер элемента');
         }
         $current = $this->first;
-        for ($i = 0; $i < $offset; $i++) {
+       while (--$offset) {
             $current = $current->getNext();
         }
         $current->setValue($value);
@@ -166,42 +166,5 @@ class DoublyLinkedListNode implements DoublyLinkedListInterface, \ArrayAccess, \
     public function getIterator()
     {
         return new DoublyLinkedListNodeIterator($this->first);
-    }
-}
-
-class DoublyLinkedListNodeIterator implements \Iterator
-{
-    protected $first;
-    /** @var ListNode */
-    protected $current;
-
-    public function __construct($node)
-    {
-        $this->first = $this->current = $node;
-    }
-
-    public function current()
-    {
-        return $this->current->getValue();
-    }
-
-    public function key()
-    {
-        return '';
-    }
-
-    public function next()
-    {
-        $this->current = $this->current->getNext();
-    }
-
-    public function rewind()
-    {
-        $this->current = $this->first;
-    }
-
-    public function valid()
-    {
-        return isset($this->current);
     }
 }

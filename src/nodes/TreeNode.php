@@ -1,19 +1,61 @@
 <?php
 
+namespace DataStructure\nodes;
 
-class a
+class TreeNode
 {
     protected $left;
     protected $right;
     protected $value;
-    protected $count;
+    public $count = 0;
 
-    Интерфейс
-    Везде целые числа
-Обход дерева поиска сортировано по возрастанию
-Обход дерева поиска по убыванию
-Существование элемента
-Поиск минимума и максимума
-Вставка
-Удаление
+    public function setRight(?TreeNode $node = null): self
+    {
+        $this->right = $node;
+
+        return $this;
+    }
+
+    public function getRight(): ?TreeNode
+    {
+        return $this->right;
+    }
+
+    public function setLeft(?TreeNode $node = null): self
+    {
+        $this->left = $node;
+
+        return $this;
+    }
+
+    public function getLeft(): ?TreeNode
+    {
+        return $this->left;
+    }
+
+    public function setValue($value): self
+    {
+        $this->value = $value;
+        return $this;
+    }
+
+    public function getValue()
+    {
+        return $this->value;
+    }
+
+    public function getCount(): int
+    {
+        return $this->count;
+    }
+
+    public function increaseCounter()
+    {
+        ++$this->count;
+    }
+
+    public function decreaseCounter()
+    {
+        --$this->count;
+    }
 }

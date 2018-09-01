@@ -4,6 +4,12 @@ require_once '../../vendor/autoload.php';
 
 use DataStructure\structures\Stack;
 
+$input = fopen("php://stdin", "r");
+$output = fopen("php://stdout", "w");
+
+fwrite($output, "Введите строку для проверки баланка скобок: \r\n");
+fscanf($input, "%s", $string);
+
 $brackets = [
     '>' => '<',
     ')' => '(',
@@ -12,8 +18,6 @@ $brackets = [
 ];
 $open = ['<', '(', '[', '{'];
 $close = ['>', ')', ']', '}'];
-
-$string = '{{{{{{{sad(1)}';
 
 $stack = new Stack();
 $fail = false;
@@ -32,5 +36,7 @@ for ($i = 0; $i < strlen($string); $i++) {
 }
 if (!$stack->isEmpty()) {
     $fail = true;
+    fprintf($output, "Баланс скобок не соблюдён");
+} else {
+    fprintf($output, "Баланс скобок соблюдён");
 }
-var_dump($fail);

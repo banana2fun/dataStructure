@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace DataStructure\contracts;
 
 interface DoublyLinkedListInterface
@@ -14,5 +16,5 @@ interface DoublyLinkedListInterface
 
     public function isEmpty(): bool;
 
-    public function at($index, bool $back = null);
+    public function at(int $index, bool $back);
 }

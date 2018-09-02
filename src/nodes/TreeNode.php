@@ -7,7 +7,7 @@ class TreeNode
     protected $left;
     protected $right;
     protected $value;
-    public $count = 0;
+    protected $count = 0;
 
     public function setRight(?TreeNode $node = null): self
     {
@@ -39,7 +39,7 @@ class TreeNode
         return $this;
     }
 
-    public function getValue()
+    public function getValue(): int
     {
         return $this->value;
     }
@@ -49,13 +49,9 @@ class TreeNode
         return $this->count;
     }
 
-    public function increaseCounter()
+    public function increaseCounter(): self
     {
         ++$this->count;
-    }
-
-    public function decreaseCounter()
-    {
-        --$this->count;
+        return $this;
     }
 }

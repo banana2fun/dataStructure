@@ -89,21 +89,21 @@ class DoublyLinkedListNode implements DoublyLinkedListInterface, \ArrayAccess, \
         return false;
     }
 
-    public function at(int $index, bool $back)
+    public function at(int $index, bool $back = false)
     {
-        $back === false ? $current = $this->first : $current = $this->last;
+        $current = $back === false ? $this->first : $this->last;
         $item = 1;
         while ($current) {
             if ($item === $index) {
                 return $current->getValue();
             }
             $item++;
-            $back === false ? $current = $current->getNext() : $current = $current->getPrevious();
+            $current = $back === false ? $current->getNext() : $current->getPrevious();
         }
     }
 
 
-    public function offsetExists($offset)
+    public function offsetExists($offset): bool
     {
         if ($offset >= $this->count || $offset < 0) {
             return false;
@@ -117,7 +117,7 @@ class DoublyLinkedListNode implements DoublyLinkedListInterface, \ArrayAccess, \
             throw new \Exception('Неверный номер элемента');
         }
         $current = $this->first;
-       while (--$offset) {
+        while (--$offset) {
             $current = $current->getNext();
         }
         return $current->getValue();
@@ -129,7 +129,7 @@ class DoublyLinkedListNode implements DoublyLinkedListInterface, \ArrayAccess, \
             throw new \Exception('Неверный номер элемента');
         }
         $current = $this->first;
-       while (--$offset) {
+        while (--$offset) {
             $current = $current->getNext();
         }
         $current->setValue($value);

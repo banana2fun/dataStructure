@@ -31,16 +31,11 @@ class Tree implements TreeInterface
         if ($this->isEmpty()) {
             throw new Exception('Дерево пустое');
         }
-        $max = $this->root->getValue();
         $current = $this->root;
         while ($current->getRight() !== null) {
-            $max = $current->getValue();
             $current = $current->getRight();
-            if ($current->getRight() === null) {
-                $max = $current->getValue();
-            }
         }
-        return $max;
+        return $current->getValue();
     }
 
     public function searchMin(): int
@@ -48,16 +43,11 @@ class Tree implements TreeInterface
         if ($this->isEmpty()) {
             throw new Exception('Дерево пустое');
         }
-        $min = $this->root->getValue();
         $current = $this->root;
         while ($current->getLeft() !== null) {
-            $min = $current->getValue();
             $current = $current->getLeft();
-            if ($current->getLeft() === null) {
-                $min = $current->getValue();
-            }
         }
-        return $min;
+        return $current->getValue();
     }
 
     public function elementCount(int $value): int
@@ -94,29 +84,29 @@ class Tree implements TreeInterface
 
     protected function pushNode(int $value, ?TreeNode $root = null, ?TreeNode $parent = null): void
     {
-        if ($this->isEmpty()) {
+        if ($root === null) {
             $node = new TreeNode();
             $node->setValue($value)->setLeft()->setRight()->increaseCounter();
-            $this->root = $node;
-        } elseif ($root === null) {
-            $node = new TreeNode();
-            $node->setValue($value)->setLeft()->setRight()->increaseCounter();
+            if ($this->isEmpty()) {
+                $this->root = $node;
+                return;
+            }
             if ($value > $parent->getValue()) {
                 $parent->setRight($node);
             } else {
                 $parent->setLeft($node);
             }
-        } else {
-            if ($root->getValue() === $value) {
-                $root->increaseCounter();
-            } else {
-                if ($root->getValue() > $value) {
-                    $this->pushNode($value, $root->getLeft(), $root);
-                } else {
-                    $this->pushNode($value, $root->getRight(), $root);
-                }
-            }
+            return;
         }
+        if ($root->getValue() === $value) {
+            $root->increaseCounter();
+            return;
+        }
+        $this->pushNode(
+            $value,
+            $root->getValue() > $value ? $root->getLeft() : $root->getRight(),
+            $root
+        );
     }
 
     protected function numberOfElementExistence(int $value, ?TreeNode $root): int
@@ -124,75 +114,67 @@ class Tree implements TreeInterface
         if ($root === null) {
             return 0;
         }
-        if ($root->getValue() === $value) {
-            return $root->getCount();
-        }
         if ($root->getValue() > $value) {
             return $this->numberOfElementExistence($value, $root->getLeft());
         } elseif ($root->getValue() < $value) {
             return $this->numberOfElementExistence($value, $root->getRight());
         }
+        return $root->getCount();
     }
 
     protected function detourInDescendingOrder(?TreeNode $root, int $level): void
     {
-        if ($root !== null) {
-            $this->detourInDescendingOrder($root->getLeft(), $level + 1);
-            $string = '';
-            for ($i = 0; $i < $level; $i++) {
-                $string .= '    ';
-            }
-            echo $string . $root->getValue() . PHP_EOL;
-            $this->detourInDescendingOrder($root->getRight(), $level + 1);
+        if ($root === null) {
+            return;
         }
+        $this->detourInDescendingOrder($root->getLeft(), $level + 1);
+        echo implode(array_fill(0, $level, "\t")) . $root->getValue() . PHP_EOL;
+        $this->detourInDescendingOrder($root->getRight(), $level + 1);
     }
 
     protected function detourInIncreaseOrder(?TreeNode $root, int $level): void
     {
-        if ($root !== null) {
-            $this->detourInIncreaseOrder($root->getRight(), $level + 1);
-            $string = '';
-            for ($i = 0; $i < $level; $i++) {
-                $string .= '    ';
-            }
-            echo $string . $root->getValue() . PHP_EOL;
-            echo $root->getValue();
-            $this->detourInIncreaseOrder($root->getLeft(), $level + 1);
+        if ($root === null) {
+            return;
         }
+        $this->detourInIncreaseOrder($root->getRight(), $level + 1);
+        echo implode(array_fill(0, $level, "\t")) . $root->getValue() . PHP_EOL;
+        $this->detourInIncreaseOrder($root->getLeft(), $level + 1);
     }
 
     protected function deleteBranch($value, ?TreeNode $root): ?TreeNode
     {
-        if ($root !== null) {
-            $rootValue = $root->getValue();
-            $left = $root->getLeft();
-            $right = $root->getRight();
-            if ($left !== null && $left->getValue() === $value) {
-                $root->setLeft();
-                return $left;
-            } elseif ($right !== null && $right->getValue() === $value) {
-                $root->setRight();
-                return $right;
-            }
-            if ($rootValue === $value) {
-                $this->root = null;
-                return $root;
-            } elseif ($rootValue > $value) {
-                return $this->deleteBranch($value, $left);
-            } elseif ($rootValue < $value) {
-                return $this->deleteBranch($value, $right);
-            }
+        if ($root === null) {
+            return null;
         }
+        $rootValue = $root->getValue();
+        $left = $root->getLeft();
+        $right = $root->getRight();
+        if ($left !== null && $left->getValue() === $value) {
+            $root->setLeft();
+            return $left;
+        } elseif ($right !== null && $right->getValue() === $value) {
+            $root->setRight();
+            return $right;
+        }
+        if ($rootValue > $value) {
+            return $this->deleteBranch($value, $left);
+        } elseif ($rootValue < $value) {
+            return $this->deleteBranch($value, $right);
+        }
+        $this->root = null;
+        return $root;
     }
 
     protected function pushBranchWithoutRootNode($value, ?TreeNode $branch): void
     {
-        if ($branch !== null) {
-            if ($branch->getValue() !== $value) {
-                $this->push($branch->getValue());
-            }
-            $this->pushBranchWithoutRootNode($value, $branch->getRight());
-            $this->pushBranchWithoutRootNode($value, $branch->getLeft());
+        if ($branch === null) {
+            return;
         }
+        if ($branch->getValue() !== $value) {
+            $this->push($branch->getValue());
+        }
+        $this->pushBranchWithoutRootNode($value, $branch->getRight());
+        $this->pushBranchWithoutRootNode($value, $branch->getLeft());
     }
 }
